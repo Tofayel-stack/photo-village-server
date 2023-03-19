@@ -23,6 +23,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run(){
     const serviceCollection = client.db("photo_village").collection("photographer_services");
+    const reviewCollection = client.db("service_review").collection("services_review_data");
 
 
     try{
@@ -55,13 +56,20 @@ async function run(){
 
 
 
+      // POST APIs 
+
+      app.post('/serviceReview',async(req,res)=>{
+          const reviewObj = req.body;
+          const result = await reviewCollection.insertOne(reviewObj);
+          res.send(result)
+
+      })
 
 
 
 
 
 
-      
       app.all('*',async(req,res)=>{
         res.send('no Route found')
       })
