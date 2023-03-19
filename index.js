@@ -44,12 +44,30 @@ async function run(){
         res.send(result)
        })
 
-      app.get('/servDetails/:id',(req,res)=>{
-        console.log(req)
+      app.get('/servDetails/:id',async(req,res)=>{
+        const id = req.params;
+        const query = {_id:new ObjectId(id)}
+        const result = await serviceCollection.findOne(query);
+        res.send(result)
       })
 
 
 
+
+
+
+
+
+
+
+
+      
+      app.all('*',async(req,res)=>{
+        res.send('no Route found')
+      })
+
+
+      
 
 
 
