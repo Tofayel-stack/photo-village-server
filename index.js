@@ -14,6 +14,7 @@ app.use(express.json())
 
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { query } = require('express');
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@photo-village.kapv1dn.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
@@ -59,6 +60,13 @@ async function run(){
         res.send(result)
       })
 
+      app.get('/myreview/:email',async(req,res)=>{
+        const email = req.params.email;
+        const query = { reviewerEmail : email }
+        const result = await reviewCollection.find(query).toArray()
+        res.send(result)
+      })
+
 
 
 
@@ -75,6 +83,15 @@ async function run(){
 
 
 
+
+      // DELETE APIs 
+
+      app.delete('/myreview/:id',async(req,res)=>{
+        const id = req.params;
+        const query = {_id:new ObjectId(id)};
+        const result = await reviewCollection.deleteOne(query);
+        res.send(result)
+      })
 
 
       app.all('*',async(req,res)=>{
