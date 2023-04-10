@@ -30,6 +30,7 @@ async function run(){
     try{
         // get APIs
 
+      // all service in service route 
 
        app.get('/services',async(req,res)=>{
         const query = {}
@@ -39,12 +40,20 @@ async function run(){
        })
 
 
+
+
+      //  for limit load in HOME page 
+
        app.get('/limitService',async(req,res)=>{
         const query = {}
         const cursor = serviceCollection.find(query).limit(3)
         const result= await cursor.toArray()
         res.send(result)
        })
+
+
+
+      //  individual service details show
 
       app.get('/servDetails/:id',async(req,res)=>{
         const id = req.params;
@@ -53,12 +62,22 @@ async function run(){
         res.send(result)
       })
 
+
+
+
+      //its a review api . arry srot by time . dicending.sort({_id:-1}) now acending sort({_id:1})
+
       app.get('/serviceReview/:id',async(req,res)=>{
         const id = req.params.id;
         const query = {serviceId:id}
-        const result = await reviewCollection.find(query).toArray();
+        const result = await reviewCollection.find(query).sort({_id:-1}).toArray();
         res.send(result)
       })
+
+
+
+
+      // specific user review collection
 
       app.get('/myreview/:email',async(req,res)=>{
         const email = req.params.email;
@@ -94,6 +113,10 @@ async function run(){
       })
 
 
+
+
+      //  response for wrong route or API call 
+
       app.all('*',async(req,res)=>{
         res.send('no Route found')
       })
@@ -117,7 +140,7 @@ run().catch(error => console.log(error))
 
 
 
-
+// check the server OK or NOT
 app.get('/',(req,res)=>{
     res.send('all ok your server >>> running')
 })
