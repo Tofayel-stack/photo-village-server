@@ -180,9 +180,9 @@ async function run(){
 
       //  response for wrong route or API call 
 
-      app.all('*',async(req,res)=>{
-        res.send('no Route found')
-      })
+      // app.all('*',async(req,res)=>{
+      //   res.send('no Route found')
+      // })
 
 
       
@@ -205,7 +205,7 @@ run().catch(error => console.log(error))
 
 // check the server OK or NOT
 app.get('/',(req,res)=>{
-    res.send('all ok your server >>> running')
+    res.send('photo village server running')
 })
 
 
