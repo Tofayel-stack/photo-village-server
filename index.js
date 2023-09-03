@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors')
 require('dotenv').config()
-
+const jwt = require('jsonwebtoken')
 
 const app = express()
 const port = process.env.port || 5000 ;
@@ -20,6 +20,28 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@photo-v
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
+const verifyToken = (req,res,next) => {
+
+  const authHeader = req?.headers?.authorization
+ 
+
+  if(!authHeader){
+    return res.status(401).send({message:'unAuthorized user'})
+  }
+
+  const token = authHeader.split(' ')[1]
+  jwt.verify(token, process.env.TOKEN_SIGNATURE , function(err, decoded) {
+    if(err){
+     return res.status(403).send({message:'forbidden access'})
+    }
+
+    req.decoded = decoded;
+    next()
+
+
+  });
+}
+
 
 
 async function run(){
@@ -28,6 +50,30 @@ async function run(){
 
 
     try{
+
+
+      // jwt api 
+
+      app.post('/jwt',(req,res)=>{
+        const user = req.body;
+        
+        const token = jwt.sign(user, process.env.TOKEN_SIGNATURE , { expiresIn: '10h' })
+
+          console.log(token)
+          res.send({token})
+      })
+
+
+
+
+
+
+
+
+
+
+
+
         // get APIs
 
       // all service in service route 
@@ -79,11 +125,28 @@ async function run(){
 
       // specific user review collection
 
-      app.get('/myreview/:email',async(req,res)=>{
-        const email = req.params.email;
-        const query = { reviewerEmail : email }
-        const result = await reviewCollection.find(query).toArray()
-        res.send(result)
+      app.get('/myreview/:email', verifyToken , async(req,res)=>{
+        
+        // console.log(req.headers.authorization);
+
+        const decoded = req.decoded;
+
+        console.log(decoded);
+
+        if(decoded?.email === req.params?.email){
+
+          const email = req.params.email;
+          const query = { reviewerEmail : email }
+          const result = await reviewCollection.find(query).toArray()
+          res.send(result)
+  
+        }else{
+          
+   
+        res.send({message:'unAuthorized User'})
+        }
+
+
       })
 
 
